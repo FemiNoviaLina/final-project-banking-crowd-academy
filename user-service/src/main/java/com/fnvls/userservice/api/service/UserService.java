@@ -6,6 +6,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.List;
 
 public interface UserService extends UserDetailsService {
-    public List<UserOutputDto> getUnapprovedUsers();
+    public List<UserOutputDto> getUnapprovedUsers(Integer limit, Integer offset);
     public void approveUsersApplication(List<Long> input);
 }

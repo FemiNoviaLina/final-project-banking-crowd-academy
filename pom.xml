@@ -7,6 +7,7 @@
 	<modules>
 		<module>discovery-service</module>
 		<module>user-service</module>
+		<module>api-gateway</module>
 	</modules>
 
 	<parent>

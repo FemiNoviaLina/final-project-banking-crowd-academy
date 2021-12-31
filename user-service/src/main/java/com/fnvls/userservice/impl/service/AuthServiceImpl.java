@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository.save(user);
 
         UserOutputDto out = modelMapper.map(user, UserOutputDto.class);
-        out.setToken(jwtUtil.generateToken(user.getEmail()));
+        out.setToken(jwtUtil.generateToken(user.getEmail(), user.getRole()));
 
         return out;
     }
@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
             System.out.println(user);
 
             UserOutputDto out = modelMapper.map(user, UserOutputDto.class);
-            out.setToken(jwtUtil.generateToken(user.getEmail()));
+            out.setToken(jwtUtil.generateToken(user.getEmail(), user.getRole()));
             return out;
         } catch (BadCredentialsException e) {
             throw e;

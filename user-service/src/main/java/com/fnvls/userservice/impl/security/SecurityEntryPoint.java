@@ -24,4 +24,3 @@ public class SecurityEntryPoint implements AuthenticationEntryPoint {
         httpServletResponse.getWriter().print(objectMapper.writeValueAsString(response));
     }
 }
-

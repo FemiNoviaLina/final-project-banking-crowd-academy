@@ -6,6 +6,7 @@ import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -27,15 +28,24 @@ public class JwtUtil {
         return null;
     }
 
-    public String generateToken(String id) {
-        Claims claims = Jwts.claims().setSubject(id);
+    public String generateToken(String email, String role) {
+        Claims claims = Jwts.claims().setSubject(email);
         long nowMillis = System.currentTimeMillis();
         long expMillis = nowMillis + tokenValidity;
         Date exp = new Date(expMillis);
-        return Jwts.builder().setClaims(claims).setIssuedAt(new Date(nowMillis)).setExpiration(exp).signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .claim("email", email)
+                .claim("role", role)
+                .setIssuedAt(new Date(nowMillis))
+                .setExpiration(exp)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+        return token;
     }
 
     public boolean validateToken(final String token) throws JwtTokenMalformedException, JwtTokenMissingException {
+        System.out.println(token);
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
