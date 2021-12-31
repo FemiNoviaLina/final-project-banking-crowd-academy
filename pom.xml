@@ -6,6 +6,7 @@
 
 	<modules>
 		<module>discovery-service</module>
+		<module>user-service</module>
 	</modules>
 
 	<parent>
@@ -24,12 +25,23 @@
 	<properties>
 		<java.version>11</java.version>
 		<eureka.version>3.1.0</eureka.version>
+		<lombok.version>1.18.22</lombok.version>
+		<postgresql.version>42.3.0</postgresql.version>
+		<spring-cloud.version>2021.0.0</spring-cloud.version>
+		<model-mapper.version>2.4.5</model-mapper.version>
+		<swagger.version>2.9.2</swagger.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
 		</dependency>
 
 		<dependency>
