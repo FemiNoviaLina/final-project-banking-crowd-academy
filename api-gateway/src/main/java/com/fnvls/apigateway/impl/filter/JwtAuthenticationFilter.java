@@ -50,28 +50,22 @@ public class JwtAuthenticationFilter implements GatewayFilter {
                 return response.writeWith(Flux.just(responseBody).map(r -> response.bufferFactory().wrap(r)));
             }
 
-            final String token = request.getHeaders().getOrEmpty("Authorization").get(0);
+            final String token = request.getHeaders().getOrEmpty("Authorization").get(0).substring(7);
 
             try {
                 jwtUtil.validateToken(token);
-            } catch (JwtTokenMalformedException e) {
+            } catch (JwtTokenMalformedException | JwtTokenMissingException e) {
                 ServerHttpResponse response = exchange.getResponse();
                 response.setStatusCode(HttpStatus.BAD_REQUEST);
                 response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                ExceptionBody body = new ExceptionBody("JWT token invalid");
-                byte[] responseBody = objectMapper.writeValueAsBytes(body);
-                return response.writeWith(Flux.just(responseBody).map(r -> response.bufferFactory().wrap(r)));
-            } catch (JwtTokenMissingException e) {
-                ServerHttpResponse response = exchange.getResponse();
-                response.setStatusCode(HttpStatus.BAD_REQUEST);
-                response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                ExceptionBody body = new ExceptionBody("JWT token missing");
+                ExceptionBody body = new ExceptionBody(e.getMessage());
                 byte[] responseBody = objectMapper.writeValueAsBytes(body);
                 return response.writeWith(Flux.just(responseBody).map(r -> response.bufferFactory().wrap(r)));
             }
 
             Claims claims = jwtUtil.getClaims(token);
-            exchange.getRequest().mutate().header("id", String.valueOf(claims.getId())).build();
+            exchange.getRequest().mutate().header("email", claims.get("email").toString()).build();
+            exchange.getRequest().mutate().header("role", claims.get("role").toString()).build();
         }
         return chain.filter(exchange);
     }
