@@ -12,6 +12,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 
 server:
   port: 8762
@@ -25,4 +31,7 @@ eureka:
 
 jwt:
   secret: secretkey
-  token.validity: 180000
+  token.validity: 3600000
+
+file:
+  upload-dir: ./user-service/public

@@ -6,7 +6,6 @@ import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -28,8 +27,8 @@ public class JwtUtil {
         return null;
     }
 
-    public String generateToken(String email, String role) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String generateToken(String id, String email, String role) {
+        Claims claims = Jwts.claims().setSubject(id);
         long nowMillis = System.currentTimeMillis();
         long expMillis = nowMillis + tokenValidity;
         Date exp = new Date(expMillis);

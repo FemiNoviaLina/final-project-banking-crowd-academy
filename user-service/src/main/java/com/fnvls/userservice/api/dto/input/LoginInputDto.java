@@ -11,6 +11,7 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginInputDto {
     @NotBlank(message = "Email is not allowed to be null")
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message = "Invalid email")
     private String email;
 
     @NotBlank(message = "Password is not allowed to be null")
