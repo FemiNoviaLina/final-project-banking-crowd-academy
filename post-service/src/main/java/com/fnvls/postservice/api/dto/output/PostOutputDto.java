@@ -22,7 +22,7 @@ public class PostOutputDto {
 
     private int comments_count;
 
-    private CategoryOutputDto categories;
+    private List<PostCategoryOutputDto> categories;
 
     private Date createdAt;
 

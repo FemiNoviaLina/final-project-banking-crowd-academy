@@ -12,6 +12,12 @@ spring:
       password: password
       authentication-database: femi_novia_lina
       auto-index-creation: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 
 logging:
   level:
@@ -29,3 +35,6 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:${random.uuid}
+
+file:
+  upload-dir: ./post-service/public

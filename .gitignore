@@ -34,3 +34,5 @@ build/
 
 user-service/public/*
 !user-service/public/.gitkeep
+post-service/public/*
+!post-service/public/.gitkeep
