@@ -16,12 +16,14 @@ public class GatewayConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth", r -> r.path("/auth/**").filters(f -> f.filter(filter)).uri("lb://user-service"))
-                .route("user", r -> r.path("/user/*").filters(f -> f.filter(filter)).uri("lb://user-service"))
-                .route("users", r -> r.path("/users/*").filters(f -> f.filter(filter)).uri("lb://user-service"))
+                .route("user", r -> r.path("/user/**").filters(f -> f.filter(filter)).uri("lb://user-service"))
+                .route("users", r -> r.path("/users/**").filters(f -> f.filter(filter)).uri("lb://user-service"))
                 .route("training", r -> r.path("/training/**").filters(f -> f.filter(filter)).uri("lb://training-service"))
                 .route("trainings", r -> r.path("/trainings/**").filters(f -> f.filter(filter)).uri("lb://training-service"))
                 .route("post", r -> r.path("/post/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
                 .route("posts", r -> r.path("/posts/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+                .route("category", r -> r.path("/category/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+                .route("categories", r -> r.path("/categories/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
                 .build();
     }
 }
