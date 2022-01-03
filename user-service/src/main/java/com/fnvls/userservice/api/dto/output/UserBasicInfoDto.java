@@ -2,16 +2,13 @@ package com.fnvls.userservice.api.dto.output;
 
 import lombok.*;
 
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserOutputDto {
+public class UserBasicInfoDto {
     private Long id;
     private String email;
-    private String token;
-    private Date createdAt;
-    private Date updatedAt;
+    private String name;
+    private String Role;
 }

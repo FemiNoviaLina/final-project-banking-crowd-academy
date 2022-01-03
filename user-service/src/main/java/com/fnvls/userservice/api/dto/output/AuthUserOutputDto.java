@@ -8,12 +8,10 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserProfileOutputDto {
-    private UserBasicInfoDto userBasicInfo;
-    private String profilePic;
-    private String dateOfBirth;
-    private String phoneNumber;
-    private String address;
+public class AuthUserOutputDto {
+    private Long id;
+    private String email;
+    private String token;
     private Date createdAt;
     private Date updatedAt;
 }

@@ -1,8 +1,8 @@
 package com.fnvls.userservice.impl.controller;
 
-import com.fnvls.userservice.api.dto.input.IdInputDto;
 import com.fnvls.userservice.api.dto.input.UserProfileInputDto;
-import com.fnvls.userservice.api.dto.output.UserOutputDto;
+import com.fnvls.userservice.api.dto.output.AuthUserOutputDto;
+import com.fnvls.userservice.api.dto.output.UserBasicInfoDto;
 import com.fnvls.userservice.api.dto.output.UserProfileOutputDto;
 import com.fnvls.userservice.api.response.BaseResponse;
 import com.fnvls.userservice.api.service.UserService;
@@ -27,15 +27,24 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @GetMapping("users/application")
-    public ResponseEntity<BaseResponse<List<UserOutputDto>>> getUnapprovedUsers(
+    @GetMapping("/user/{id}")
+    public ResponseEntity<BaseResponse<UserBasicInfoDto>> getUser(@PathVariable Long id) {
+        UserBasicInfoDto user = userService.getUser(id);
+
+        if(user == null) return new ResponseEntity(new BaseResponse<>(user), HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity(new BaseResponse<>(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/users/application")
+    public ResponseEntity<BaseResponse<List<AuthUserOutputDto>>> getUnapprovedUsers(
             @RequestHeader("role") String role,
             @RequestParam(defaultValue = "10") Integer limit,
             @RequestParam(defaultValue = "0") Integer offset
     ) {
         if(!role.equals("admin")) return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Access to this resource is denied"), HttpStatus.FORBIDDEN);
 
-        List<UserOutputDto> users = userService.getUnapprovedUsers(limit, offset);
+        List<AuthUserOutputDto> users = userService.getUnapprovedUsers(limit, offset);
 
         return new ResponseEntity(new BaseResponse<>(users), HttpStatus.OK);
     }
@@ -43,7 +52,7 @@ public class UserController {
     @PatchMapping(value = "/users/approval", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse> approveUsers(
             @RequestHeader("role") String role,
-            @RequestBody List<IdInputDto> input
+            @RequestBody List<Long> input
     ) {
         if(!role.equals("admin")) return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Access to this resource is denied"), HttpStatus.FORBIDDEN);
 
@@ -52,7 +61,7 @@ public class UserController {
         return new ResponseEntity(new BaseResponse(Boolean.TRUE, "Updated"), HttpStatus.OK);
     }
 
-    @PutMapping("user/profile/{id}")
+    @PutMapping("/user/profile/{id}")
     public ResponseEntity<BaseResponse<UserProfileOutputDto>> updateUserProfile(
             @RequestHeader String role,
             @RequestHeader String sub,
@@ -71,7 +80,25 @@ public class UserController {
         return new ResponseEntity(new BaseResponse<>(userProfile), HttpStatus.OK);
     }
 
-    @GetMapping("user/profile-pic/{fileName:.+}")
+    @GetMapping("/user/profile/{id}")
+    public ResponseEntity<BaseResponse<UserProfileOutputDto>> getUserProfile(
+            @RequestHeader String role,
+            @RequestHeader String sub,
+            @PathVariable String id
+    ) {
+        Long userId = Long.parseLong(id);
+
+        if(!sub.equals(id.toString()) && !role.equals("admin"))
+            return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Access to this resource is denied"), HttpStatus.FORBIDDEN);
+
+        UserProfileOutputDto userProfile = userService.getUserProfile(userId);
+
+        if(userProfile == null) return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "User not found"), HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity(new BaseResponse<>(userProfile), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/profile-pic/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         Resource resource = userService.loadFileAsResource(fileName);
 
@@ -91,5 +118,4 @@ public class UserController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
-
 }

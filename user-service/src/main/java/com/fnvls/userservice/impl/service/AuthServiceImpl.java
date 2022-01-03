@@ -2,7 +2,7 @@ package com.fnvls.userservice.impl.service;
 
 import com.fnvls.userservice.api.dto.input.LoginInputDto;
 import com.fnvls.userservice.api.dto.input.RegisterInputDto;
-import com.fnvls.userservice.api.dto.output.UserOutputDto;
+import com.fnvls.userservice.api.dto.output.AuthUserOutputDto;
 import com.fnvls.userservice.api.service.AuthService;
 import com.fnvls.userservice.data.User;
 import com.fnvls.userservice.impl.repository.UserRepository;
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private AuthenticationManager authenticationManager;
 
     @Override
-    public UserOutputDto register(RegisterInputDto input) {
+    public AuthUserOutputDto register(RegisterInputDto input) {
         User temp = userRepository.findDistinctUserByEmail(input.getEmail());
 
         if(temp != null) return null;
@@ -56,14 +56,13 @@ public class AuthServiceImpl implements AuthService {
 
         this.userRepository.save(user);
 
-        UserOutputDto out = modelMapper.map(user, UserOutputDto.class);
-        out.setToken(jwtUtil.generateToken(user.getId().toString(), user.getEmail(), user.getRole()));
+        AuthUserOutputDto out = modelMapper.map(user, AuthUserOutputDto.class);
 
         return out;
     }
 
     @Override
-    public UserOutputDto login(LoginInputDto input) {
+    public AuthUserOutputDto login(LoginInputDto input) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -74,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
 
-            UserOutputDto out = modelMapper.map(user, UserOutputDto.class);
+            AuthUserOutputDto out = modelMapper.map(user, AuthUserOutputDto.class);
             out.setToken(jwtUtil.generateToken(user.getId().toString(), user.getEmail(), user.getRole()));
             return out;
         } catch (BadCredentialsException e) {

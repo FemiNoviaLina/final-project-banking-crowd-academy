@@ -1,8 +1,8 @@
 package com.fnvls.userservice.impl.service;
 
-import com.fnvls.userservice.api.dto.input.IdInputDto;
 import com.fnvls.userservice.api.dto.input.UserProfileInputDto;
-import com.fnvls.userservice.api.dto.output.UserOutputDto;
+import com.fnvls.userservice.api.dto.output.AuthUserOutputDto;
+import com.fnvls.userservice.api.dto.output.UserBasicInfoDto;
 import com.fnvls.userservice.api.dto.output.UserProfileOutputDto;
 import com.fnvls.userservice.api.service.UserService;
 import com.fnvls.userservice.data.User;
@@ -62,23 +62,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserOutputDto> getUnapprovedUsers(Integer limit, Integer offset) {
+    public List<AuthUserOutputDto> getUnapprovedUsers(Integer limit, Integer offset) {
         Pageable paging = PageRequest.of(offset, limit);
         Page<User> usersPage = userRepository.findByEnabledAndRoleIn(Boolean.FALSE, List.of("learner", "trainer"), paging);
 
         List<User> users = usersPage.getContent();
-        List<UserOutputDto> out = new ArrayList<>();
+        List<AuthUserOutputDto> out = new ArrayList<>();
         for (User user : users) {
-            out.add(modelMapper.map(user, UserOutputDto.class));
+            out.add(modelMapper.map(user, AuthUserOutputDto.class));
         }
 
         return out;
     }
 
     @Override
-    public void approveUsersApplication(List<IdInputDto> input) {
-        input.forEach(idInputDto -> {
-            Optional<User> temp = userRepository.findById(idInputDto.getId());
+    public void approveUsersApplication(List<Long> input) {
+        input.forEach(idInput -> {
+            Optional<User> temp = userRepository.findById(idInput);
             temp.ifPresent(user -> {
                 user.setEnabled(true);
                 userRepository.save(user);
@@ -151,5 +151,34 @@ public class UserServiceImpl implements UserService {
         } catch (MalformedURLException ex) {
             throw new MyFileNotFoundException("File not found " + fileName, ex);
         }
+    }
+
+    @Override
+    public UserProfileOutputDto getUserProfile(Long id) {
+        Optional<User> tempUser = userRepository.findById(id);
+        
+        if(tempUser.isEmpty()) return null;
+
+        Optional<UserProfile> tempUserProfile = userProfileRepository.findById(id);
+
+        UserProfileOutputDto out = UserProfileOutputDto.builder().build();
+
+        if(!tempUserProfile.isEmpty()) modelMapper.map(tempUserProfile.get(), out);
+        UserBasicInfoDto userBasicInfo = modelMapper.map(tempUser.get(), UserBasicInfoDto.class);
+        out.setUserBasicInfo(userBasicInfo);
+
+        System.out.println(out);
+        return out;
+    }
+
+    @Override
+    public UserBasicInfoDto getUser(Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isEmpty()) return null;
+
+        UserBasicInfoDto out = modelMapper.map(user.get(), UserBasicInfoDto.class);
+
+        return out;
     }
 }

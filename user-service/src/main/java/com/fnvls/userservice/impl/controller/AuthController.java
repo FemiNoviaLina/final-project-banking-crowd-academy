@@ -2,7 +2,7 @@ package com.fnvls.userservice.impl.controller;
 
 import com.fnvls.userservice.api.dto.input.LoginInputDto;
 import com.fnvls.userservice.api.dto.input.RegisterInputDto;
-import com.fnvls.userservice.api.dto.output.UserOutputDto;
+import com.fnvls.userservice.api.dto.output.AuthUserOutputDto;
 import com.fnvls.userservice.api.response.BaseResponse;
 import com.fnvls.userservice.api.service.AuthService;
 import com.fnvls.userservice.impl.security.JwtUtil;
@@ -28,17 +28,17 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/user")
-    public ResponseEntity<BaseResponse<UserOutputDto>> register(@Valid @RequestBody RegisterInputDto input) {
-        UserOutputDto user = authService.register(input);
+    public ResponseEntity<BaseResponse<AuthUserOutputDto>> register(@Valid @RequestBody RegisterInputDto input) {
+        AuthUserOutputDto user = authService.register(input);
 
         if(user == null) return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Email already registered"), HttpStatus.CONFLICT);
         return new ResponseEntity(new BaseResponse<>(user), HttpStatus.CREATED);
     }
 
     @PostMapping("/session")
-    public ResponseEntity<BaseResponse<UserOutputDto>> login(@Valid @RequestBody LoginInputDto input) {
+    public ResponseEntity<BaseResponse<AuthUserOutputDto>> login(@Valid @RequestBody LoginInputDto input) {
         try {
-            UserOutputDto user = authService.login(input);
+            AuthUserOutputDto user = authService.login(input);
             return new ResponseEntity(new BaseResponse<>(user), HttpStatus.OK);
         } catch (LockedException e) {
             return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Account has not been enabled"), HttpStatus.FORBIDDEN);
