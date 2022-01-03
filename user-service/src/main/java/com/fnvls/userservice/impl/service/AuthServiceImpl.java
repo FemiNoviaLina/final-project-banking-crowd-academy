@@ -74,8 +74,6 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
 
-            System.out.println(user);
-
             UserOutputDto out = modelMapper.map(user, UserOutputDto.class);
             out.setToken(jwtUtil.generateToken(user.getId().toString(), user.getEmail(), user.getRole()));
             return out;

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: default
+  data:
+    mongodb:
+      host: 34.101.137.236
+      port: 27017
+      database: femi_novia_lina
+      username: femi_novia_lina
+      password: password
+      authentication-database: femi_novia_lina
+      auto-index-creation: true
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb: debug
+
+server:
+  port: 8763
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:${random.uuid}
