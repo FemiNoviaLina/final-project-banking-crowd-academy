@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: log-service
+  profiles:
+    active: default
+  kafka:
+    groupId: loggingGroup
+    bootstrap-servers: localhost:9092
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: loggingGroup
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      bootstrap-servers: localhost:9092
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  data:
+    mongodb:
+      host: 34.101.137.236
+      port: 27017
+      database: femi_novia_lina
+      username: femi_novia_lina
+      password: password
+      authentication-database: femi_novia_lina
+      auto-index-creation: true
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb: debug
+
+server:
+  port: 8764
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:${random.uuid}
+
+app:
+  topic: logging

@@ -9,6 +9,7 @@
 		<module>user-service</module>
 		<module>api-gateway</module>
         <module>post-service</module>
+        <module>log-service</module>
     </modules>
 
 	<parent>
