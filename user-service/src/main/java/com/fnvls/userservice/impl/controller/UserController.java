@@ -1,5 +1,6 @@
 package com.fnvls.userservice.impl.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fnvls.userservice.api.dto.input.UserProfileInputDto;
 import com.fnvls.userservice.api.dto.output.AuthUserOutputDto;
 import com.fnvls.userservice.api.dto.output.UserBasicInfoDto;
@@ -7,6 +8,8 @@ import com.fnvls.userservice.api.dto.output.UserProfileOutputDto;
 import com.fnvls.userservice.api.response.BaseResponse;
 import com.fnvls.userservice.api.service.UserService;
 import com.fnvls.userservice.impl.security.JwtUtil;
+import com.fnvls.userservice.impl.service.KafkaService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class UserController {
     @Autowired
@@ -27,8 +31,17 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private KafkaService kafkaService;
+
     @GetMapping("/user/{id}")
     public ResponseEntity<BaseResponse<UserBasicInfoDto>> getUser(@PathVariable Long id) {
+        try {
+            kafkaService.produce(kafkaService.buildMessage("GET /user/" + id, new Object()));
+        } catch (JsonProcessingException e) {
+            log.info("Catch Json Processing Exception {}", e);
+        }
+
         UserBasicInfoDto user = userService.getUser(id);
 
         if(user == null) return new ResponseEntity(new BaseResponse<>(user), HttpStatus.NOT_FOUND);
@@ -42,6 +55,12 @@ public class UserController {
             @RequestParam(defaultValue = "10") Integer limit,
             @RequestParam(defaultValue = "0") Integer offset
     ) {
+        try {
+            kafkaService.produce(kafkaService.buildMessage("GET /users/application", new Object()));
+        } catch (JsonProcessingException e) {
+            log.info("Catch Json Processing Exception {}", e);
+        }
+
         if(!role.equals("admin")) return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Access to this resource is denied"), HttpStatus.FORBIDDEN);
 
         List<AuthUserOutputDto> users = userService.getUnapprovedUsers(limit, offset);
@@ -54,6 +73,11 @@ public class UserController {
             @RequestHeader("role") String role,
             @RequestBody List<Long> input
     ) {
+        try {
+            kafkaService.produce(kafkaService.buildMessage("PATCH /users/approval", input));
+        } catch (JsonProcessingException e) {
+            log.info("Catch Json Processing Exception {}", e);
+        }
         if(!role.equals("admin")) return new ResponseEntity(new BaseResponse<>(Boolean.FALSE, "Access to this resource is denied"), HttpStatus.FORBIDDEN);
 
         userService.approveUsersApplication(input);
@@ -68,6 +92,12 @@ public class UserController {
             @PathVariable String id,
             UserProfileInputDto input
     ) {
+        try {
+            kafkaService.produce(kafkaService.buildMessage("PUT /user/profile" + id, input));
+        } catch (JsonProcessingException e) {
+            log.info("Catch Json Processing Exception {}", e);
+        }
+
         Long userId = Long.parseLong(id);
 
         if(!sub.equals(id.toString()) && !role.equals("admin"))
@@ -86,6 +116,11 @@ public class UserController {
             @RequestHeader String sub,
             @PathVariable String id
     ) {
+        try {
+            kafkaService.produce(kafkaService.buildMessage("GET /user/profile" + id, new Object()));
+        } catch (JsonProcessingException e) {
+            log.info("Catch Json Processing Exception {}", e);
+        }
         Long userId = Long.parseLong(id);
 
         if(!sub.equals(id.toString()) && !role.equals("admin"))
@@ -100,6 +135,11 @@ public class UserController {
 
     @GetMapping("/user/profile-pic/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+        try {
+            kafkaService.produce(kafkaService.buildMessage("GET /user/profile-pic/" + fileName, new Object()));
+        } catch (JsonProcessingException e) {
+            log.info("Catch Json Processing Exception {}", e);
+        }
         Resource resource = userService.loadFileAsResource(fileName);
 
         String contentType = null;

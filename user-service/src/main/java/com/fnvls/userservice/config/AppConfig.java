@@ -1,5 +1,6 @@
 package com.fnvls.userservice.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.Condition;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -15,5 +16,10 @@ public class AppConfig {
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.getConfiguration().setDeepCopyEnabled(true);
         return modelMapper;
+    }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

@@ -1,6 +1,19 @@
 spring:
   application:
     name: user-service
+  kafka:
+    groupId: loggingGroup
+    bootstrap-servers: 172.25.238.38:9092
+    consumer:
+      bootstrap-servers: 172.25.238.38:9092
+      group-id: loggingGroup
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      bootstrap-servers: 172.25.238.38:9092
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
   jackson:
     default-property-inclusion: non_null
   datasource:
@@ -35,3 +48,6 @@ jwt:
 
 file:
   upload-dir: ./user-service/public
+
+app:
+  topic: logging
