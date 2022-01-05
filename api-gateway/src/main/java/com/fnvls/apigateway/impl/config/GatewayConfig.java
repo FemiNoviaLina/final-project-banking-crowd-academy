@@ -24,6 +24,7 @@ public class GatewayConfig {
                 .route("posts", r -> r.path("/posts/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
                 .route("category", r -> r.path("/category/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
                 .route("categories", r -> r.path("/categories/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+                .route("logs", r -> r.path("/logs/**").filters(f -> f.filter(filter)).uri("lb://log-service"))
                 .build();
     }
 }
