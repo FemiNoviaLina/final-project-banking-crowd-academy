@@ -7,7 +7,9 @@ import com.fnvls.postservice.api.service.PostCommentService;
 import com.fnvls.postservice.data.Comment;
 import com.fnvls.postservice.data.Post;
 import com.fnvls.postservice.data.PostComment;
+import com.fnvls.postservice.impl.exception.PostNotFoundException;
 import com.fnvls.postservice.impl.repository.PostCommentRepository;
+import com.fnvls.postservice.impl.repository.PostRepository;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,17 @@ public class PostCommentServiceImpl implements PostCommentService {
     private PostCommentRepository postCommentRepository;
 
     @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
     public CommentOutputDto createComment(String sub, String id, CommentInputDto input) {
+        Optional<Post> tempPost = postRepository.findById(id);
+
+        if(tempPost.isEmpty()) throw new PostNotFoundException();
+
         Optional <PostComment> tempPostComment = postCommentRepository.findById(id);
 
         PostComment postComment;
@@ -48,12 +57,19 @@ public class PostCommentServiceImpl implements PostCommentService {
         postComment.getComments().add(comment);
         postCommentRepository.save(postComment);
 
+        Post post = tempPost.get();
+        post.setComments_count(post.getComments_count() + 1);
+        postRepository.save(post);
+
         CommentOutputDto out = modelMapper.map(comment, CommentOutputDto.class);
         return out;
     }
 
     @Override
     public CommentOutputDto getComment(String postId, String id) {
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) throw new PostNotFoundException();
+
         Optional <PostComment> tempPostComment = postCommentRepository.findById(postId);
 
         if(tempPostComment.isEmpty()) return null;
@@ -72,6 +88,9 @@ public class PostCommentServiceImpl implements PostCommentService {
 
     @Override
     public void deleteComment(String postId, String id) {
+        Optional<Post> tempPost = postRepository.findById(postId);
+
+        if(tempPost.isEmpty()) throw new PostNotFoundException();
         Optional <PostComment> tempPostComment = postCommentRepository.findById(postId);
 
         if(tempPostComment.isEmpty()) return;
@@ -86,16 +105,18 @@ public class PostCommentServiceImpl implements PostCommentService {
         }
 
         postCommentRepository.save(postComment);
+        Post post = tempPost.get();
+        post.setComments_count(post.getComments_count() - 1);
+        postRepository.save(post);
     }
 
     @Override
     public PostCommentOutputDto getCommentsOnPost(String id) {
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isEmpty()) throw new PostNotFoundException();
         Optional<PostComment> tempPostComment = postCommentRepository.findById(id);
-
         if(tempPostComment.isEmpty()) return null;
-
         PostComment postComment = tempPostComment.get();
-
         PostCommentOutputDto out = modelMapper.map(postComment, PostCommentOutputDto.class);
         return out;
     }

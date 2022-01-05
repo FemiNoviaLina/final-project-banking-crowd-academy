@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/post")
-public class postCommentController {
+public class PostCommentController {
     @Autowired
     private PostCommentService postCommentService;
 

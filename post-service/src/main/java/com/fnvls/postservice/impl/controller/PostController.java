@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
-@Controller
+@RestController
 public class PostController {
     @Autowired
     private PostService postService;
