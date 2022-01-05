@@ -9,6 +9,7 @@ import com.fnvls.userservice.data.User;
 import com.fnvls.userservice.data.UserProfile;
 import com.fnvls.userservice.impl.exception.FileStorageException;
 import com.fnvls.userservice.impl.exception.MyFileNotFoundException;
+import com.fnvls.userservice.impl.exception.UserNotFoundException;
 import com.fnvls.userservice.impl.property.FileStorageProperty;
 import com.fnvls.userservice.impl.repository.UserProfileRepository;
 import com.fnvls.userservice.impl.repository.UserRepository;
@@ -33,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,7 +125,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public String storeImage(MultipartFile file) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileExtention = StringUtils.cleanPath(file.getOriginalFilename()).split("\\.")[1];
+
+        String fileName = "image-post" + Long.toString(new Date().getTime()) + "." +fileExtention;
         try {
             if (fileName.contains("..")) {
                 throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
@@ -157,7 +161,7 @@ public class UserServiceImpl implements UserService {
     public UserProfileOutputDto getUserProfile(Long id) {
         Optional<User> tempUser = userRepository.findById(id);
         
-        if(tempUser.isEmpty()) return null;
+        if(tempUser.isEmpty()) throw new UserNotFoundException("User not found");
 
         Optional<UserProfile> tempUserProfile = userProfileRepository.findById(id);
 
@@ -175,7 +179,7 @@ public class UserServiceImpl implements UserService {
     public UserBasicInfoDto getUser(Long id) {
         Optional<User> user = userRepository.findById(id);
 
-        if(user.isEmpty()) return null;
+        if(user.isEmpty()) throw new UserNotFoundException("User not found");
 
         UserBasicInfoDto out = modelMapper.map(user.get(), UserBasicInfoDto.class);
 
