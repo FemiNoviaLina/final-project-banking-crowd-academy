@@ -22,7 +22,7 @@ public class RegisterInputDto {
 
     @EnumValidator(
             enumClass = Role.class,
-            message = "This error is coming from the enum class"
+            message = "Invalid role"
     )
     private String role;
 }
