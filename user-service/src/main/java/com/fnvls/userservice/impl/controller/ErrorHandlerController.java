@@ -48,7 +48,7 @@ public class ErrorHandlerController {
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public BaseResponse<?> handleBadCredentialsException(MissingPathVariableException ex) {
+    public BaseResponse<?> handleBadCredentialsException(BadCredentialsException ex) {
         String message = ex.getMessage();
         BaseResponse<?> response = new BaseResponse<>(null);
         response.setMessage(message);
@@ -114,7 +114,7 @@ public class ErrorHandlerController {
     @ExceptionHandler(JsonProcessingException.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public BaseResponse<?> handleJsonProcessingException(MissingPathVariableException ex) {
+    public BaseResponse<?> handleJsonProcessingException(JsonProcessingException ex) {
         String message = "Error while parsing JSON";
         BaseResponse<?> response = new BaseResponse<>(null);
         response.setMessage(message);
@@ -125,7 +125,7 @@ public class ErrorHandlerController {
     @ExceptionHandler(IOException.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public BaseResponse<?> handleIOException(MissingPathVariableException ex) {
+    public BaseResponse<?> handleIOException(IOException ex) {
         String message = "Error while getting file";
         BaseResponse<?> response = new BaseResponse<>(null);
         response.setMessage(message);
